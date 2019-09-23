@@ -18,7 +18,7 @@ void Neural_Network::Init_Weights()
 
 Neural_Network::Neural_Network(int neurons, double spd, int epochs)
 {
-	srand(time(0));
+	//srand(time(0));
 	Neural_Network::input_size = 784;
 	Neural_Network::output_size = 10;
 	Neural_Network::hidden_size = neurons;
@@ -69,7 +69,7 @@ void Neural_Network::Calculate_dE(double* input, double* label, double* dE1, dou
 	double* output1, double* output2, double* div1)
 {
 	double dE1_sum;
-	double reg_rate = 0;
+	double reg_rate = 0.0001;
 
 	for (int j = 0; j < output_size; j++)
 	{
@@ -98,10 +98,16 @@ void Neural_Network::Calculate_E(double* input, double* label, double& E, double
 		j_sum = 0;
 		for (int j = 0; j < output_size; j++)
 		{
-			j_sum += log(output2[k*output_size + j]) * label[k * output_size + j];
+			//cout << output2[k * output_size + j] << " ";
+			if(output2[k * output_size + j] != 0)
+				j_sum += log(output2[k*output_size + j]) * label[k * output_size + j];
+
 		}
 		E += j_sum;
+
 	}
+	if (E == 0)
+		cout << E;
 	E = -E;
 }
 
@@ -117,7 +123,7 @@ double Neural_Network::Calculate_acc(double* label, double* output2, int number_
 
 	return acc;
 }
-void Neural_Network::Back_Prop(double* dE1, double* dE2)
+void Neural_Network::Back_Prop(double* dE1, double* dE2, int number_of_images)
 {
 
 	for (int j = 0; j < output_size; j++)
@@ -129,7 +135,7 @@ void Neural_Network::Back_Prop(double* dE1, double* dE2)
 			//w2[j * hidden_size + s] -= speed * dE2[k][j * hidden_size + s];
 			//if (dE2[k][j * hidden_size + s] != 0)
 			//	cout << w2[j * hidden_size + s] << endl;
-			w2[j * hidden_size + s] -= speed*1.2 * dE2[j * hidden_size + s];
+			w2[j * hidden_size + s] -= speed * dE2[j * hidden_size + s]/number_of_images;
 		}
 	}
 
@@ -138,7 +144,7 @@ void Neural_Network::Back_Prop(double* dE1, double* dE2)
 		for (int i = 0; i < input_size; i++)
 		{
 					
-			w1[s * input_size + i] -= speed * dE1[s * input_size + i];
+			w1[s * input_size + i] -= speed * dE1[s * input_size + i] / number_of_images;
 
 			//if (dE1[k][s * input_size + i])
 			//	cout << 1 << " ";
@@ -155,7 +161,7 @@ void Neural_Network::Back_Prop(double* dE1, double* dE2)
 	}
 }
 
-void Neural_Network::Learn(double* input, double* label, int number_of_images)
+void Neural_Network::Fit(double* input, double* label, int number_of_images)
 {
 
 	double* b1 = new double[hidden_size * number_of_images];
@@ -192,8 +198,10 @@ void Neural_Network::Learn(double* input, double* label, int number_of_images)
 
 			Calculate_dE(&input[image * 784], &label[image * 10], dE1, dE2, &b1[hidden_size * image], &b2[output_size *image], div1);
 
-			Back_Prop(dE1, dE2);
-			Forward(&input[image * 784], &b1[hidden_size * image], &b2[output_size * image], div1, div2);
+			Back_Prop(dE1, dE2, number_of_images);
+			if (epoch == 266)
+				cout << " ";
+			//Forward(&input[image * 784], &b1[hidden_size * image], &b2[output_size * image], div1, div2);
 			//std::cout << "after: ";
 			//for (int i = 0; i < 10; i++)
 			//	//if (i == 2 || i == 7)
@@ -208,5 +216,49 @@ void Neural_Network::Learn(double* input, double* label, int number_of_images)
 		if (E != E)
 			cout << " ";
 		std::cout << endl;
+	}
+}
+
+void Neural_Network::Fit_Batch(double* input, double* label, int number_of_images, int batch_size)
+{
+
+	double* b1 = new double[hidden_size * batch_size];
+	double* b2 = new double[output_size * batch_size];
+	double* div1 = new double[hidden_size * batch_size];
+	double* div2 = new double[output_size * batch_size];
+	double E;
+	double** dE1 = new double* [batch_size];
+	double** dE2 = new double* [batch_size];
+
+	for (int i = 0; i < batch_size; i++)
+	{
+		dE1[i]= new double[784 * hidden_size];
+		dE2[i] = new double[10 * hidden_size];
+	}
+	for (int epoch = 0; epoch < iterations; epoch++)
+	{
+		for (int batch = 0; batch < (int)number_of_images/batch_size; batch++)
+		{
+			for (int image = 0; image < batch_size; image++)
+			{
+				Forward(&input[(batch*batch_size + image) * 784], &b1[hidden_size * image], &b2[output_size * image],
+					&div1[hidden_size * image], &div2[output_size * image]);
+
+				Calculate_dE(&input[(batch * batch_size + image) * 784], &label[(batch * batch_size + image) * 10],
+					dE1[image], dE2[image], &b1[hidden_size * image], &b2[output_size * image], &div1[hidden_size * image]);
+			}
+			for (int image = 0; image < batch_size; image++)
+			{
+				Back_Prop(dE1[image], dE2[image], number_of_images);
+			}
+			std::cout <<"epoch"<< epoch << " " << batch;
+			std::cout << "acc: " << Calculate_acc(&label[(batch * batch_size) * 10], b2, number_of_images) << ", ";
+			Calculate_E(&input[(batch * batch_size) * 784], &label[(batch * batch_size) * 10], E, b2, number_of_images);
+			std::cout << "err = " << E << endl;
+			if (E != E)
+				cout << " ";
+			std::cout << endl;
+		}
+		
 	}
 }

@@ -6,16 +6,16 @@
 
 int main()
 {
-	int size = 3;
-	int neurons = 50;
+	int size = 5;
+	int neurons = 100;
 	double* ar = new double[784 * size];
 	double* lb = new double[10* size];
 	for (int i = 0; i < 10 * size; i++)
 		lb[i] = 0;
 	Load_Test_Data(ar, lb, size);
 
-	Neural_Network net(neurons, 0.0005, 1000);
-	net.Learn(ar, lb, size);
+	Neural_Network net(neurons, 0.001, 1000);
+	net.Fit(ar, lb, size);
 
 	//double* b1 = new double[neurons*size];
 	//double* b2 = new double[10*size];

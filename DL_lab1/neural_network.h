@@ -23,13 +23,15 @@ private:
 
 	double Calculate_acc(double* label, double* output2, int number_of_images);
 
-	void Back_Prop(double* dE1, double* dE2);
+	void Back_Prop(double* dE1, double* dE2, int number_of_images);
 
 
 public:
 	Neural_Network(int neurons, double spd, int epochs); 
 
-	void Learn(double* input, double* label, int number_of_images);
+	void Fit(double* input, double* label, int number_of_images);
+
+	void Fit_Batch(double* input, double* label, int number_of_images, int batch_size);
 };
 
 #endif

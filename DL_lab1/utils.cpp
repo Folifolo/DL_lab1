@@ -92,6 +92,7 @@ void Multiplication_Array_Vector(double* Arr, double* Vec, double* Res, int size
 {
 	for (int i = 0; i < size_i; i++)
 		Res[i] = 0.0;
+#pragma omp parallel for
 	for (int i = 0; i < size_i; i++)
 		for (int j = 0; j < size_j; j++)
 			Res[i] += Arr[i * size_j + j] * Vec[j];
