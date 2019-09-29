@@ -8,7 +8,7 @@ int main()
 {
 	int size = 3;
 	int neurons = 10;
-	double* ar = new double[784 * size];
+	double* ar = new double[785 * size];
 	double* lb = new double[10* size];
 	for (int i = 0; i < 10 * size; i++)
 		lb[i] = 0;
@@ -17,7 +17,7 @@ int main()
 	for (int i = 0; i < 10; i++)
 	if(lb[j*10+i]!=0)
 		std::cout << "num " << i << endl;
-	Neural_Network net(neurons, 0.001, 1000);
+	Neural_Network net(neurons, 0.001, 1000, 785, 10);
 	net.Fit(ar, lb, size);
 
 	//double* b1 = new double[neurons*size];

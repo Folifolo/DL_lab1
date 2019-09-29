@@ -41,9 +41,10 @@ void Read_MNIST(string path, int NumberOfImages, int DataOfAnImage, double* arr)
 				{
 					unsigned char temp = 0;
 					file.read((char*)& temp, sizeof(temp));
-					arr[i*n_cols*n_rows + r*n_cols + c] = (double)temp/255;
+					arr[i*n_cols*n_rows + r*n_cols + c+ i] = (double)temp/255;
 				}
 			}
+			arr[i * n_cols * n_rows + n_cols * n_rows + i] = 1;
 		}
 	}
 }

@@ -17,7 +17,10 @@ private:
 
 	double Relu_d(double x);
 
-	void Forward(double* input, double* output1, double* output2, double* div1, double* div2);
+	void Forward(double* input, double* output1, double* output2);
+
+	void Forward_div(double* input, double* output1, double* output2, double* div1, double* div2);
+
 
 	void Calculate_dE(double* input, double* label, double* dE1, double* dE2,
 		double* output1, double* output2, double* div1);
@@ -28,7 +31,7 @@ private:
 
 
 public:
-	Neural_Network(int neurons, double spd, int epochs); 
+	Neural_Network(int neurons, double spd, int epochs, int input_s = 784, int output_s=10); 
 
 	void Fit(double* input, double* label, int number_of_images);
 
