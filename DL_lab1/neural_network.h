@@ -13,14 +13,15 @@ private:
 	int iterations;
 	void Init_Weights();
 
+	double Relu(double x);
+
+	double Relu_d(double x);
+
 	void Forward(double* input, double* output1, double* output2, double* div1, double* div2);
 
 	void Calculate_dE(double* input, double* label, double* dE1, double* dE2,
 		double* output1, double* output2, double* div1);
-
-	void Calculate_E(double* input, double* label, double& E, double* output2, int number_of_images);
-
-
+		
 	double Calculate_acc(double* label, double* output2, int number_of_images);
 
 	void Back_Prop(double* dE1, double* dE2, int number_of_images);
@@ -32,6 +33,11 @@ public:
 	void Fit(double* input, double* label, int number_of_images);
 
 	void Fit_Batch(double* input, double* label, int number_of_images, int batch_size);
+
+	void Predict(double* input, double* prediction, int number_of_images);
+
+	double Calculate_E(double* label, double* prediction, int number_of_images);
+
 };
 
 #endif
